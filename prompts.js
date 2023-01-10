@@ -62,3 +62,5 @@ const promptUser = async () => {
     }
   }
 };
+
+export { fetchPokemon };
