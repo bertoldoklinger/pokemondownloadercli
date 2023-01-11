@@ -6,14 +6,14 @@ const promptForPokemon = async () => {
   return await inquirer.prompt({
     type: "input",
     name: "pokemonName",
-    message: "Pokemon name:",
+    message: "Nome do Pokémon :",
   });
 };
 
 const promptForDownloadInfo = async () => {
   return await inquirer.prompt({
     type: "checkbox",
-    message: "Select info to download!",
+    message: "Selecione informaçoes para baixar!",
     name: "options",
     choices: [
       new inquirer.Separator(" -- Options -- "),
@@ -34,7 +34,7 @@ const promptToContinue = async () => {
   return await inquirer.prompt({
     type: "confirm",
     name: "continueAnotherDownload",
-    message: "Would you like to search for another pokémon?",
+    message: "Você gostaria de buscar outro pokémon?",
   });
 };
 
