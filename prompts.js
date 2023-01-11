@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import inquirer from "inquirer";
+import { parseOptions } from "./saving.js";
 
 const promptForPokemon = async () => {
   return await inquirer.prompt({
@@ -48,13 +49,12 @@ const fetchPokemon = async (pokemonName) => {
 const promptUser = async () => {
   while (true) {
     const pokemonName = await promptForPokemon();
-    console.log(pokemonName.pokemonName);
 
     const pokemonJSON = await fetchPokemon(pokemonName.pokemonName);
-    console.log(pokemonJSON.name, pokemonJSON.weight);
 
     const pokemonOptions = await promptForDownloadInfo();
-    console.log(pokemonOptions.options);
+
+    await parseOptions(pokemonJSON, pokemonOptions);
 
     const keepGoing = await promptToContinue();
     if (keepGoing.continueAnotherDownload === false) {
@@ -63,4 +63,4 @@ const promptUser = async () => {
   }
 };
 
-export { fetchPokemon };
+export { promptUser };

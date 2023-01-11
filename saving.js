@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-import { fetchPokemon } from "./prompts.js";
 import fetch from "node-fetch";
 
 const saveImageFile = async (filePath, arrayBuffer) => {
@@ -15,8 +14,6 @@ const createFolder = async (folderName) => {
     fs.mkdir(folderPath);
   }
 };
-
-const pokemonObject = await fetchPokemon("mewtwo");
 
 const savePokemonStats = async (folderName, pokemonStatsObject) => {
   let statsString = "";
@@ -39,4 +36,46 @@ const savePokemonArtwork = async (folderName, pokemonSpritesObject) => {
   await saveImageFile(filePath, arrayBuffer);
 };
 
-savePokemonArtwork("mewtwo", pokemonObject.sprites);
+const savePokemonSprites = async (folderName, pokemonSpritesObject) => {
+  let spritePromises = [];
+  let spriteNames = [];
+
+  for (const [name, url] of Object.entries(pokemonSpritesObject)) {
+    if (!url) continue;
+    if (name === "other" || name === "versions") continue;
+
+    spritePromises.push(fetch(url).then((res) => res.arrayBuffer()));
+    spriteNames.push(name);
+  }
+
+  spritePromises = await Promise.all(spritePromises);
+  await createFolder(folderName);
+  for (let i = 0; i < spritePromises.length; i++) {
+    const filePath = path.join(
+      process.cwd(),
+      folderName,
+      `${spriteNames[i]}.png`
+    );
+    await saveImageFile(filePath, spritePromises[i]);
+    console.log(`Saved: ${filePath}`);
+  }
+};
+
+const parseOptions = async (pokemonObject, optionsObject) => {
+  const options = optionsObject.options;
+  const pokemonName = pokemonObject.name;
+
+  if (options.includes("Stats")) {
+    await savePokemonStats(pokemonName, pokemonObject.stats);
+  }
+
+  if (options.includes("Sprites")) {
+    await savePokemonSprites(pokemonName, pokemonObject.sprites);
+  }
+
+  if (options.includes("Artwork")) {
+    await savePokemonArtwork(pokemonName, pokemonObject.sprites);
+  }
+};
+
+export { parseOptions };
